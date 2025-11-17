@@ -36,6 +36,8 @@
     <meta name="twitter:image" content="./assets/meta/tw.jpg" />
     <meta name="twitter:title" content="Choo-Choo World" />
     <meta name="twitter:url" content="./" />
+    <!-- VK Bridge SDK -->
+    <script src="https://unpkg.com/@vkontakte/vk-bridge/dist/browser.min.js"></script>
     <!-- <script async src="https://www.googletagmanager.com/gtag/js?id=G-NVP1BM95RS"></script>
     <script>if(-1!==document.location.hostname.search("choochooworld.com")){function gtag(){dataLayer.push(arguments)}window.dataLayer=window.dataLayer||[],gtag("js",new Date),gtag("config","G-NVP1BM95RS")}</script> -->
     <script>function preventZoom(e){e.preventDefault(),document.body.style.zoom=1}Object.assign||document.documentElement.classList.add("not-supported not-supported--browser"),document.documentElement.classList.remove("no-js"),/(ipad|iphone|android)/i.test((navigator.userAgent||navigator.vendor).toLowerCase())?document.documentElement.classList.add("is-mobile"):document.documentElement.classList.add("is-desktop"),document.addEventListener("gesturestart",(e=>preventZoom(e))),document.addEventListener("gesturechange",(e=>preventZoom(e))),document.addEventListener("gestureend",(e=>preventZoom(e)))</script>
@@ -135,6 +137,48 @@
                     });
                 }
             });
+        }
+    })();
+    </script>
+    <script>
+    // VK Bridge инициализация и баннерная реклама
+    (function() {
+        'use strict';
+
+        // Проверяем доступность VK Bridge
+        if (typeof vkBridge !== 'undefined') {
+            // Инициализация VK Bridge
+            vkBridge.send('VKWebAppInit')
+                .then((data) => {
+                    if (data.result) {
+                        // Приложение инициализировано
+                        console.log('VK Bridge инициализирован успешно');
+
+                        // Показываем баннерную рекламу
+                        vkBridge.send('VKWebAppShowBannerAd', {
+                            banner_location: 'top'
+                        })
+                        .then((data) => {
+                            if (data.result) {
+                                // Баннерная реклама отобразилась
+                                console.log('Баннерная реклама VK отображена');
+                            }
+                        })
+                        .catch((error) => {
+                            // Ошибка показа рекламы
+                            console.log('Ошибка показа баннерной рекламы:', error);
+                        });
+                    } else {
+                        // Ошибка инициализации
+                        console.log('Ошибка инициализации VK Bridge');
+                    }
+                })
+                .catch((error) => {
+                    // Ошибка
+                    console.log('Ошибка VK Bridge:', error);
+                });
+        } else {
+            console.log('VK Bridge недоступен');
         }
     })();
     </script>
