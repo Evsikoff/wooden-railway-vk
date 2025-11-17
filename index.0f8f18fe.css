@@ -2595,13 +2595,20 @@ a {
 
 @media (max-width: 812px) {
     #component--toolTip .component--content .toolTips .toolTip {
-        padding: 32px 16px 0
+        padding: 8px 16px 0
     }
 }
 
 #component--toolTip .component--content .toolTips .toolTip-illustration {
     height: 150px;
     width: 300px
+}
+
+@media (max-width: 812px) {
+    #component--toolTip .component--content .toolTips .toolTip-illustration {
+        height: 100px;
+        width: 200px
+    }
 }
 
 #component--toolTip .component--content .toolTips .toolTip-illustration img {
@@ -2622,6 +2629,13 @@ a {
     margin-top: 24px
 }
 
+@media (max-width: 812px) {
+    #component--toolTip .component--content .toolTips .toolTip-title {
+        font-size: 2rem;
+        margin-top: 12px
+    }
+}
+
 #component--toolTip .component--content .toolTips .toolTip-description,
 #component--toolTip .component--content .toolTips .toolTip-description-mobile {
     font-size: 1.6rem;
@@ -2633,7 +2647,8 @@ a {
 
     #component--toolTip .component--content .toolTips .toolTip-description,
     #component--toolTip .component--content .toolTips .toolTip-description-mobile {
-        margin-top: 20px
+        font-size: 1.3rem;
+        margin-top: 12px
     }
 }
 
@@ -2700,7 +2715,7 @@ a {
 
 @media (max-width: 812px) {
     #component--toolTip .component--content .toolTips .btn {
-        margin-top: 96px
+        margin-top: 24px
     }
 }
 
@@ -2774,8 +2789,8 @@ a {
 }
 
 .is-mobile .toolTip-illustration {
-    height: 100px !important;
-    width: 200px !important
+    height: 80px !important;
+    width: 160px !important
 }
 
 .is-mobile .toolTip .toolTip-illustration img:first-child {
