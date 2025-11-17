@@ -36,8 +36,14 @@
     <meta name="twitter:image" content="./assets/meta/tw.jpg" />
     <meta name="twitter:title" content="Choo-Choo World" />
     <meta name="twitter:url" content="./" />
+    <!-- Resource hints to warm up external connections and prioritize critical assets -->
+    <link rel="dns-prefetch" href="//unpkg.com" />
+    <link rel="preconnect" href="https://unpkg.com" crossorigin />
+    <link rel="preload" as="style" href="./index.0f8f18fe.css" />
+    <link rel="preload" as="script" href="./index.5955834b.js" fetchpriority="high" />
+
     <!-- VK Bridge SDK -->
-    <script src="https://unpkg.com/@vkontakte/vk-bridge/dist/browser.min.js"></script>
+    <script src="https://unpkg.com/@vkontakte/vk-bridge/dist/browser.min.js" defer></script>
     <!-- <script async src="https://www.googletagmanager.com/gtag/js?id=G-NVP1BM95RS"></script>
     <script>if(-1!==document.location.hostname.search("choochooworld.com")){function gtag(){dataLayer.push(arguments)}window.dataLayer=window.dataLayer||[],gtag("js",new Date),gtag("config","G-NVP1BM95RS")}</script> -->
     <script>function preventZoom(e){e.preventDefault(),document.body.style.zoom=1}Object.assign||document.documentElement.classList.add("not-supported not-supported--browser"),document.documentElement.classList.remove("no-js"),/(ipad|iphone|android)/i.test((navigator.userAgent||navigator.vendor).toLowerCase())?document.documentElement.classList.add("is-mobile"):document.documentElement.classList.add("is-desktop"),document.addEventListener("gesturestart",(e=>preventZoom(e))),document.addEventListener("gesturechange",(e=>preventZoom(e))),document.addEventListener("gestureend",(e=>preventZoom(e)))</script>
@@ -342,7 +348,7 @@
     })();
     </script>
     <script type="module" crossorigin src="./index.5955834b.js"></script>
-    <link rel="stylesheet" href="./index.0f8f18fe.css">
+    <link rel="stylesheet" href="./index.0f8f18fe.css" fetchpriority="high">
 </head>
 
 <body><canvas id="canvas"></canvas>
@@ -665,5 +671,16 @@
         </div>
     </div>
 </body>
+
+<script>
+    // Регистрация Service Worker для кэширования статики и ускорения повторных запусков
+    if ('serviceWorker' in navigator) {
+        window.addEventListener('load', function () {
+            navigator.serviceWorker.register('./sw.js').catch(function (error) {
+                console.warn('Service worker registration failed:', error);
+            });
+        });
+    }
+</script>
 
 </html>
