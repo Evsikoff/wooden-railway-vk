@@ -182,6 +182,165 @@
         }
     })();
     </script>
+    <script>
+    // Система сохранения и загрузки игрового прогресса с поддержкой VK Storage
+    (function() {
+        'use strict';
+
+        // Ключ для хранения данных
+        var STORAGE_KEY = 'gameProgress';
+
+        // Глобальный объект для работы с сохранениями
+        window.GameStorage = {
+            // Загрузка игрового прогресса
+            loadGameProgress: function() {
+                return new Promise(function(resolve) {
+                    console.log('[GameStorage] Начинаем загрузку игрового прогресса...');
+
+                    // Проверяем доступность VK Bridge
+                    if (typeof vkBridge !== 'undefined') {
+                        console.log('[GameStorage] VK Bridge доступен, пытаемся загрузить данные из VK Storage...');
+
+                        // Пытаемся загрузить из VK Storage
+                        vkBridge.send('VKWebAppStorageGet', {
+                            keys: [STORAGE_KEY]
+                        })
+                        .then(function(data) {
+                            console.log('[GameStorage] Получен ответ от VK Storage:', data);
+
+                            if (data.keys && data.keys.length > 0) {
+                                var storageValue = data.keys[0].value;
+
+                                if (storageValue && storageValue !== '') {
+                                    try {
+                                        var gameData = JSON.parse(storageValue);
+                                        console.log('[GameStorage] ✓ Данные успешно загружены из VK Storage');
+                                        console.log('[GameStorage] Загруженные данные:', gameData);
+                                        resolve({
+                                            source: 'vk-storage',
+                                            data: gameData,
+                                            isNewPlayer: false
+                                        });
+                                        return;
+                                    } catch (error) {
+                                        console.warn('[GameStorage] ✗ Ошибка парсинга данных из VK Storage:', error);
+                                    }
+                                }
+                            }
+
+                            console.log('[GameStorage] Данных в VK Storage нет, проверяем localStorage...');
+                            resolveFromLocalStorage();
+                        })
+                        .catch(function(error) {
+                            console.warn('[GameStorage] ✗ Ошибка загрузки из VK Storage:', error);
+                            console.log('[GameStorage] Переключаемся на localStorage...');
+                            resolveFromLocalStorage();
+                        });
+                    } else {
+                        console.log('[GameStorage] VK Bridge недоступен, используем localStorage...');
+                        resolveFromLocalStorage();
+                    }
+
+                    // Функция загрузки из localStorage
+                    function resolveFromLocalStorage() {
+                        try {
+                            var localData = localStorage.getItem(STORAGE_KEY);
+
+                            if (localData && localData !== 'undefined') {
+                                var gameData = JSON.parse(localData);
+                                console.log('[GameStorage] ✓ Данные успешно загружены из localStorage');
+                                console.log('[GameStorage] Загруженные данные:', gameData);
+                                resolve({
+                                    source: 'local-storage',
+                                    data: gameData,
+                                    isNewPlayer: false
+                                });
+                            } else {
+                                console.log('[GameStorage] Данных в localStorage нет');
+                                console.log('[GameStorage] ℹ Игрок запускает приложение впервые');
+                                resolve({
+                                    source: 'none',
+                                    data: null,
+                                    isNewPlayer: true
+                                });
+                            }
+                        } catch (error) {
+                            console.warn('[GameStorage] ✗ Ошибка чтения localStorage:', error);
+                            console.log('[GameStorage] ℹ Игрок запускает приложение впервые');
+                            resolve({
+                                source: 'none',
+                                data: null,
+                                isNewPlayer: true
+                            });
+                        }
+                    }
+                });
+            },
+
+            // Сохранение игрового прогресса
+            saveGameProgress: function(gameData) {
+                return new Promise(function(resolve) {
+                    console.log('[GameStorage] Начинаем сохранение игрового прогресса...');
+                    console.log('[GameStorage] Данные для сохранения:', gameData);
+
+                    var results = {
+                        localStorage: false,
+                        vkStorage: false
+                    };
+
+                    // Сохраняем в localStorage
+                    try {
+                        var dataString = JSON.stringify(gameData);
+                        localStorage.setItem(STORAGE_KEY, dataString);
+                        results.localStorage = true;
+                        console.log('[GameStorage] ✓ Данные успешно сохранены в localStorage');
+                    } catch (error) {
+                        console.error('[GameStorage] ✗ Ошибка сохранения в localStorage:', error);
+                    }
+
+                    // Сохраняем в VK Storage
+                    if (typeof vkBridge !== 'undefined') {
+                        var dataString = JSON.stringify(gameData);
+
+                        // VK Storage имеет ограничение в 4096 байт на значение
+                        if (dataString.length > 4096) {
+                            console.warn('[GameStorage] ⚠ Размер данных превышает лимит VK Storage (4096 байт)');
+                            console.warn('[GameStorage] Размер данных: ' + dataString.length + ' байт');
+                            results.vkStorage = false;
+                            resolve(results);
+                            return;
+                        }
+
+                        vkBridge.send('VKWebAppStorageSet', {
+                            key: STORAGE_KEY,
+                            value: dataString
+                        })
+                        .then(function(data) {
+                            if (data.result) {
+                                results.vkStorage = true;
+                                console.log('[GameStorage] ✓ Данные успешно сохранены в VK Storage');
+                            } else {
+                                console.error('[GameStorage] ✗ Не удалось сохранить в VK Storage');
+                            }
+                            resolve(results);
+                        })
+                        .catch(function(error) {
+                            console.error('[GameStorage] ✗ Ошибка сохранения в VK Storage:', error);
+                            resolve(results);
+                        });
+                    } else {
+                        console.log('[GameStorage] VK Bridge недоступен, сохранение только в localStorage');
+                        resolve(results);
+                    }
+                });
+            }
+        };
+
+        // Автоматическая загрузка при старте
+        console.log('[GameStorage] Система сохранения игрового прогресса инициализирована');
+        console.log('[GameStorage] Доступные методы: loadGameProgress(), saveGameProgress(data)');
+    })();
+    </script>
     <script type="module" crossorigin src="./index.5955834b.js"></script>
     <link rel="stylesheet" href="./index.0f8f18fe.css">
 </head>
